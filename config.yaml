@@ -1,0 +1,103 @@
+# ============================================================
+#  SfM Masker – Configurazione Pipeline
+#  Modifica questi parametri per adattare la pipeline
+#  al tuo dataset specifico.
+# ============================================================
+
+# ── Percorsi ─────────────────────────────────────────────────
+paths:
+  dataset_dir: "DATASET"          # cartella immagini di input
+  output_dir:  "OUTPUT"           # cartella output principale
+  masks_dir:   "OUTPUT/MASKS"     # maschere binarie finali
+  preview_dir: "OUTPUT/PREVIEW"   # anteprime con overlay colorato
+  report_dir:  "OUTPUT/REPORT"    # grafici e report JSON
+
+# ── Formati immagine accettati ────────────────────────────────
+image_extensions:
+  - ".jpg"
+  - ".jpeg"
+  - ".png"
+  - ".tif"
+  - ".tiff"
+  - ".bmp"
+
+# ── Modulo 1: Image Quality Assessment (IQA) ─────────────────
+iqa:
+  enabled: true
+  # Soglia varianza Laplaciano: sotto questa soglia = sfocata
+  sharpness_threshold: 80.0
+  # Percentuale massima pixel sottoesposti (valore < 30)
+  underexposure_max_pct: 0.30
+  # Percentuale massima pixel sovraesposti (valore > 225)
+  overexposure_max_pct: 0.30
+  # Risoluzione minima in megapixel
+  min_resolution_mp: 1.0
+  # Se True, le immagini che non superano IQA vengono saltate
+  skip_failed: false
+
+# ── Modulo 2: Detect-Then-Segment ────────────────────────────
+segmentation:
+  # Modello YOLOv8 per la segmentazione a istanza
+  # Opzioni: yolov8n-seg, yolov8s-seg, yolov8m-seg, yolov8l-seg, yolov8x-seg
+  yolo_model: "yolov8x-seg.pt"
+  # Soglia di confidenza minima per i rilevamenti (0-1)
+  confidence_threshold: 0.45
+  # Soglia IoU per la Non-Maximum Suppression
+  iou_threshold: 0.45
+  # Dimensione immagine per l'inferenza YOLO (pixel, multiplo di 32)
+  imgsz: 1280
+  # Dimensione batch per l'inferenza GPU
+  batch_size: 4
+  # Categorie COCO da mascherare (0=person, 1=bicycle, 2=car, 3=motorcycle,
+  # 5=bus, 7=truck, 14=bird, 15=cat, 16=dog, 17=horse)
+  target_classes:
+    - 0    # person
+    - 1    # bicycle
+    - 2    # car
+    - 3    # motorcycle
+    - 5    # bus
+    - 7    # truck
+  # Raffinamento bordi con SAM2 (richiede installazione separata)
+  use_sam2: false
+  sam2_checkpoint: "sam2_hiera_large.pt"
+  sam2_config: "sam2_hiera_l.yaml"
+
+# ── Modulo 3: Post-processing morfologico ────────────────────
+morphology:
+  # Dimensione kernel di dilatazione (pixel)
+  dilation_kernel_size: 5
+  # Numero di iterazioni di dilatazione
+  dilation_iterations: 2
+  # Area minima componente connessa (pixel²) – sotto = rumore
+  min_component_area: 200
+  # Raggio chiusura per filling buchi interni
+  closing_kernel_size: 15
+
+# ── Export maschere per piattaforme SfM ──────────────────────
+export:
+  # Formato maschera: "metashape" | "odm" | "realitycapture" | "all"
+  platform: "all"
+  # Metashape: bianco = occluso, nero = valido
+  metashape_white_is_masked: true
+  # Genera preview con overlay colorato
+  generate_preview: true
+  preview_alpha: 0.45          # opacità overlay rosso
+  preview_color: [255, 0, 0]   # BGR – rosso
+
+# ── Report e metriche ─────────────────────────────────────────
+report:
+  # Formato report: "json" | "csv" | "both"
+  format: "both"
+  # Genera grafici matplotlib
+  generate_charts: true
+  # DPI grafici
+  chart_dpi: 150
+  # Genera dashboard riepilogativa
+  generate_dashboard: true
+
+# ── Hardware ──────────────────────────────────────────────────
+hardware:
+  # "cuda" | "cpu" | "auto"
+  device: "auto"
+  # Numero workers per il dataloader
+  num_workers: 4
