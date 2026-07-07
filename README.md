@@ -107,4 +107,4 @@ python main.py
 
 ## Cited
 
-Tavolare, R.: Integrating Computer Vision Models into SfM Photogrammetry: An Automated Pipeline for Occlusion Mask Generation. Under review for the 2026 International Conference on Computational Science and Its Applications (ICCSA 2026).
+Tavolare, R. (2027). Integrating Computer Vision Models into SfM Photogrammetry: An Automated Pipeline for Occlusion Mask Generation. In: Gervasi, O., et al. Computational Science and Its Applications – ICCSA 2026 Workshops. ICCSA 2026. Lecture Notes in Computer Science, vol 16762. Springer, Cham. https://doi.org/10.1007/978-3-032-30524-4_8
